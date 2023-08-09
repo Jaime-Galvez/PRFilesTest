@@ -1,0 +1,49 @@
+name: "All Files Action"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+jobs:
+  all_files:
+    name: "All Changed Files"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout source code"
+        uses: actions/checkout@v3
+
+      - name: "Get ALL Changes"
+        id: all-changes
+        uses: tj-actions/changed-files@v37
+
+      - name: "List ALL Changes"
+        run: |
+          echo 'Changes detected? ${{ steps.all-changes.outputs.any_changed }}'
+          echo 'Files changed: ${{ steps.all-changes.outputs.all_changed_files }}'
+          echo 'No. Files: ${{ steps.all-changes.outputs.all_changed_files_count }}'
+
+  specific_files:
+    name: "Specific Files Only"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout source code"
+        uses: actions/checkout@v3
+
+      - name: "Get changes"
+        id: some-changes
+        uses: tj-actions/changed-files@v37
+        with:
+          files_yaml: |
+            html:
+              - '**/*.html'
+            css:
+              - '**/*.css'
+            js:
+              - '**/*.js'
+
+      - name: "List changes"
+        run: |
+          echo 'Changed detected (HTML, CSS, JS)? ${{ steps.some-changes.outputs.html_any_changed }} ${{ steps.some-changes.outputs.css_any_changed }} ${{ steps.some-changes.outputs.js_any_changed }}'
+          echo 'HTML Files: ${{ steps.some-changes.outputs.html_all_changed_files }}'
+          echo 'CSS Files: ${{ steps.some-changes.outputs.css_all_changed_files }}'
+          echo 'JS Files: ${{ steps.some-changes.outputs.js_all_changed_files }}'
